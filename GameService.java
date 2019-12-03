@@ -8,6 +8,10 @@ public class GameService {
 
     public int nyuunyokusyori(String tate,String yoko) {
 
+        if(tate.isEmpty()||yoko.isEmpty()){
+            return 1;
+        }
+
 
         for (int i = 0; i < tate.length(); i++) {
 
@@ -30,7 +34,7 @@ public class GameService {
         int Tate = Integer.parseInt(tate);
         int Yoko = Integer.parseInt(yoko);
 
-        if(Tate>=0&&Tate<=4&&Yoko>=0&&Yoko<=4){
+        if(Tate>0&&Tate<=5&&Yoko>0&&Yoko<=5){
             return 2;
         }else {
             return 1;
