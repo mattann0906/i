@@ -5,19 +5,104 @@
     <title>Title</title>
 </head>
 <body>
+<form action="game" method="post">
 
 <p>[[${tate}]]</p>
 <p>[[${yoko}]]</p>
 
-<table border="1">
+<p>[[${joukyou}]]</p>
+<p>縦(1~5):<input name="tate" ></p>
+<p>横(1~5):<input name="yoko" ></p>
+
+<!-- ボタン -->
+<button type="submit">攻撃</button>
+
+<p></p>
+
+<p>あなたの陣地</p>
+<!-- プレイヤーの陣地テーブル作る -->
+<table border="3">
     <tr>
         <th></th></th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th>
     </tr>
 
+    <script>
+
+        var i;
+        var j;
+        var n;
+        var count = 1;
+        var myAttack=[[${myAttack}]];
+        var comAttack=[[${comAttack}]];
+        var tate=[[${tate}]];
+        var yoko=[[${yoko}]];
+
+        var allmyAttack = [];
+        var allcomAttack = [];
+
+        allmyAttack.push(myAttack);
+        allcomAttack.push(comAttack);
+
+
+        for(i=1;i<=5;i++){
+
+            document.write('<tr>');
+            document.write('<th>'+i+'</th>');
+
+            for(j=1;j<=5;j++){
+
+                for(n=0;n<allcomAttack.size();n++){
+                    if(count==allcomAttack[n]){
+                        document.write('<td>'+'・'+'</td>');
+                        continue;
+                    }
+                }
+
+                if(i==tate&&j==yoko){
+                    document.write('<td>'+'W'+'</td>');
+
+                } else {
+                    document.write('<td>'+'</td>');
+                }
+                count++;
+            }
+
+            document.write('</tr>');
+        }
+
+    </script>
+</table>
+
+<p></p>
+
+<p>敵陣地</p>
+<!-- CPUの陣地テーブルを作る -->
+
+<table border="3">
     <tr>
-        <th>1</th><th></th><th></th><th></th><th></th><th></th>
+        <th></th></th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th>
     </tr>
 
+    <script>
 
+        var i;
+        var j;
+
+        for(i=1;i<=5;i++){
+
+            document.write('<tr>');
+            document.write('<th>'+i+'</th>');
+
+            for(j=1;j<=5;j++){
+                document.write('<td>'+'</td>');
+            }
+
+            document.write('</tr>');
+        }
+
+    </script>
+</table>
+
+</form>
 </body>
 </html>
