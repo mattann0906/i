@@ -31,44 +31,30 @@
         var i;
         var j;
         var n;
+        var ifhantei;
         var count = 1;
-        var myAttack=[[${myAttack}]];
         var comAttack=[[${comAttack}]];
         var tate=[[${tate}]];
         var yoko=[[${yoko}]];
 
-        var allmyAttack = [];
         var allcomAttack = [];
 
-        allmyAttack.push(myAttack);
+
         allcomAttack.push(comAttack);
 
-
         for(i=1;i<=5;i++){
-
             document.write('<tr>');
             document.write('<th>'+i+'</th>');
-
             for(j=1;j<=5;j++){
-
-                for(n=0;n<allcomAttack.size();n++){
-                    if(count==allcomAttack[n]){
-                        document.write('<td>'+'・'+'</td>');
-                        continue;
-                    }
-                }
-
                 if(i==tate&&j==yoko){
                     document.write('<td>'+'W'+'</td>');
-
-                } else {
+                }else {
                     document.write('<td>'+'</td>');
                 }
-                count++;
             }
-
             document.write('</tr>');
         }
+
 
     </script>
 </table>
@@ -85,19 +71,45 @@
 
     <script>
 
-        var i;
-        var j;
+        var i,j,n;
+        var count=1;
+        var ifhantei;
+        var myAttack=[[${myAttack}]];
+
+
+        console.table(myAttack.length);
+
+
 
         for(i=1;i<=5;i++){
+
+            ifhantei = 0;
 
             document.write('<tr>');
             document.write('<th>'+i+'</th>');
 
+
+
             for(j=1;j<=5;j++){
+
+                for(n=0; n<myAttack.length; n++){
+                    if(myAttack[n]==count){
+                        document.write('<td>'+"・"+'</td>');
+                        ifhantei = 1;
+                    }
+                }
+
+                if(ifhantei==1){
+                    count++;
+                    ifhantei = 0;
+                    continue;
+                }
+
                 document.write('<td>'+'</td>');
             }
 
             document.write('</tr>');
+            count++;
         }
 
     </script>
