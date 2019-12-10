@@ -1,5 +1,6 @@
 package com.example.kaisen;
 
+import com.example.kaisen.model.Attack;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -8,6 +9,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import com.example.kaisen.model.GameService;
 
 import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 
 
@@ -22,12 +25,18 @@ public class WebController {
     @Autowired
     private HttpSession httpSession;
 
+    @Autowired
+    private Attack attack;
+
+    ArrayList<Integer> myAT;
+    ArrayList<Integer> comAT;
 
     @GetMapping("home")
     public String home(Model model){
         var Setumei = "あなたの戦艦の位置を決めてください";
 
-
+        myAT = new ArrayList<>();
+        comAT = new ArrayList<>();
 
         model.addAttribute("setumei",Setumei);
         return "homepage";
@@ -38,12 +47,11 @@ public class WebController {
 
         Random rnd = new Random();
 
-        var comtate = String.valueOf(rnd.nextInt(4)+1);
-        var comyoko = String.valueOf(rnd.nextInt(4)+1);
+        var comtate = String.valueOf(rnd.nextInt(5)+1);
+        var comyoko = String.valueOf(rnd.nextInt(5)+1);
 
         var myAttack = Integer.parseInt(tate)*Integer.parseInt(yoko);
         var comAttack = Integer.parseInt(comtate)*Integer.parseInt(comyoko);
-
 
 
 
@@ -90,13 +98,28 @@ public class WebController {
         var tateAT = tate;
         var yokoAT = yoko;
 
+
+
         Random rnd = new Random();
         var comtateAT = String.valueOf(rnd.nextInt(5)+1);
-        var comtoyoAT = String.valueOf(rnd.nextInt(5)+1);
+        var comyokoAT = String.valueOf(rnd.nextInt(5)+1);
+
+        var myAttack = attack.myAttack(tateAT,yokoAT);
+        var comAttack = attack.comAttack(comtateAT,comyokoAT);
+
+
+        myAT.add(myAttack);
+        comAT.add(comAttack);
+
+        System.out.println(myAttack);
+        System.out.println(comAttack);
+
+        System.out.println("myAttackLIST:"+Arrays.asList(myAT));
+        System.out.println("comAttackLIST:"+ Arrays.asList(comAT));
 
         System.out.println("my Attack "+tateAT+","+yokoAT);
         System.out.println(" ");
-        System.out.println("com Attack"+comtateAT+","+comtoyoAT);
+        System.out.println("com Attack"+comtateAT+","+comyokoAT);
         System.out.println(" ");
 
         var tate0 = (String)httpSession.getAttribute("tate");
@@ -107,23 +130,26 @@ public class WebController {
         model.addAttribute("tate", tate0);
         model.addAttribute("yoko", yoko0);
 
+        model.addAttribute("myAttack",myAT);
+        model.addAttribute("comAttack",comAT);
+
         var hantei = gameService.nyuunyokusyori(tateAT,yokoAT);
 
         if(hantei==2) {
 
             if(tateAT.equals(comtate)&&yokoAT.equals(comyoko)){
 
-                if(comtateAT.equals(tate0)&&comtoyoAT.equals(yoko0)){
+                if(comtateAT.equals(tate0)&&comyokoAT.equals(yoko0)){
                     var joukyou = "引き分け";
                     model.addAttribute("joukyou",joukyou);
                     return "win";
                 }
 
-                var joukyou = "ほな 戴きます";
+                var joukyou = "win";
                 model.addAttribute("joukyou",joukyou);
                 return "win";
 
-            } else if(comtateAT.equals(tate0)&&comtoyoAT.equals(yoko0)){
+            } else if(comtateAT.equals(tate0)&&comyokoAT.equals(yoko0)){
 
                 var joukyou = "あ な た の ま け";
                 model.addAttribute("joukyou",joukyou);
