@@ -1,6 +1,7 @@
 package com.example.kaisen;
 
 import com.example.kaisen.model.Attack;
+import com.example.kaisen.model.SensekiServise;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -28,15 +29,28 @@ public class WebController {
     @Autowired
     private Attack attack;
 
+    @Autowired
+    private SensekiServise sensekiServise;
+
     ArrayList<Integer> myAT;
     ArrayList<Integer> comAT;
+
+    private int tesuu;
+
+    @GetMapping("title")
+    public String title(Model model){
+        return "title";
+    }
 
     @GetMapping("home")
     public String home(Model model){
         var Setumei = "あなたの戦艦の位置を決めてください";
 
+        //list初期化
         myAT = new ArrayList<>();
         comAT = new ArrayList<>();
+
+        tesuu = 1;
 
         model.addAttribute("setumei",Setumei);
         return "homepage";
@@ -45,16 +59,15 @@ public class WebController {
     @PostMapping("junbi")
     public String junbi(String tate, String yoko, Model model){
 
+
+        //comのWの位置を決める
         Random rnd = new Random();
 
         var comtate = String.valueOf(rnd.nextInt(5)+1);
         var comyoko = String.valueOf(rnd.nextInt(5)+1);
 
-        var myAttack = Integer.parseInt(tate)*Integer.parseInt(yoko);
-        var comAttack = Integer.parseInt(comtate)*Integer.parseInt(comyoko);
 
-
-
+        //デバック
         System.out.println("me:"+tate+","+yoko);
         System.out.println("com:"+comtate+","+comyoko);
 
@@ -62,6 +75,7 @@ public class WebController {
 
         var joukyou = "戦闘開始";
 
+        //入力された文字を判定
         var hantei = gameService.nyuunyokusyori(tate,yoko);
 
         if(hantei==2) {
@@ -70,9 +84,9 @@ public class WebController {
             model.addAttribute("tate", tate);
             model.addAttribute("yoko", yoko);
             model.addAttribute("joukyou",joukyou);
-            model.addAttribute("myAttack",myAttack);
-            model.addAttribute("comAttack",comAttack);
+            model.addAttribute("tesuu",tesuu);
 
+            //Wの位置を記録
             httpSession.setAttribute("tate",tate);
             httpSession.setAttribute("yoko",yoko);
             httpSession.setAttribute("comtate",comtate);
@@ -80,6 +94,7 @@ public class WebController {
 
             return "junbi";
 
+            //エラー判定
         }else if(hantei==0){
             var Setumei = "数字を入力して下さい";
             model.addAttribute("setumei",Setumei);
@@ -93,88 +108,158 @@ public class WebController {
     }
 
     @PostMapping("game")
-    public String game(String tate,String yoko, Model model){
-
-        var tateAT = tate;
-        var yokoAT = yoko;
+    public String game(String tate,String yoko, Model model) {
 
 
+        //入力された文字を判定
+        var hantei = gameService.nyuunyokusyori(tate, yoko);
 
-        Random rnd = new Random();
-        var comtateAT = String.valueOf(rnd.nextInt(5)+1);
-        var comyokoAT = String.valueOf(rnd.nextInt(5)+1);
+        if (hantei == 2) {
 
-        var myAttack = attack.myAttack(tateAT,yokoAT);
-        var comAttack = attack.comAttack(comtateAT,comyokoAT);
+            var tateAT = tate;
+            var yokoAT = yoko;
+
+            var myjuuhukuhantei = 0;
+            var comjuuhukuhantei = 0;
 
 
-        myAT.add(myAttack);
-        comAT.add(comAttack);
+            //comの攻撃
+            Random rnd = new Random();
+            var comtateAT = String.valueOf(rnd.nextInt(5) + 1);
+            var comyokoAT = String.valueOf(rnd.nextInt(5) + 1);
 
-        System.out.println(myAttack);
-        System.out.println(comAttack);
+            //攻撃位置を1~25に振り分ける
+            var myAttack = attack.myAttack(tateAT, yokoAT);
+            var comAttack = attack.comAttack(comtateAT, comyokoAT);
 
-        System.out.println("myAttackLIST:"+Arrays.asList(myAT));
-        System.out.println("comAttackLIST:"+ Arrays.asList(comAT));
 
-        System.out.println("my Attack "+tateAT+","+yokoAT);
-        System.out.println(" ");
-        System.out.println("com Attack"+comtateAT+","+comyokoAT);
-        System.out.println(" ");
+            //同じ位置の攻撃を省きつつリストに攻撃履歴を追加
+            for (int n = 0; n < myAT.size(); n++) {
+                if (myAttack == myAT.get(n)) {
+                    myjuuhukuhantei = 1;
+                }
+            }
 
-        var tate0 = (String)httpSession.getAttribute("tate");
-        var yoko0 = (String)httpSession.getAttribute("yoko");
-        var comtate = (String)httpSession.getAttribute("comtate");
-        var comyoko = (String)httpSession.getAttribute("comyoko");
+            for (int j = 0; j < comAT.size(); j++) {
+                if (comAttack == comAT.get(j)) {
+                    comjuuhukuhantei = 1;
+                }
+            }
 
-        model.addAttribute("tate", tate0);
-        model.addAttribute("yoko", yoko0);
+            if (myjuuhukuhantei == 0) {
+                myAT.add(myAttack);
+            }
 
-        model.addAttribute("myAttack",myAT);
-        model.addAttribute("comAttack",comAT);
+            if (comjuuhukuhantei == 0) {
+                comAT.add(comAttack);
+            }
 
-        var hantei = gameService.nyuunyokusyori(tateAT,yokoAT);
+            //デバック
+            System.out.println(myAttack);
+            System.out.println(comAttack);
 
-        if(hantei==2) {
+            System.out.println("myAttackLIST:" + Arrays.asList(myAT));
+            System.out.println("comAttackLIST:" + Arrays.asList(comAT));
 
-            if(tateAT.equals(comtate)&&yokoAT.equals(comyoko)){
+            System.out.println("my Attack " + tateAT + "," + yokoAT);
+            System.out.println(" ");
+            System.out.println("com Attack" + comtateAT + "," + comyokoAT);
+            System.out.println(" ");
 
-                if(comtateAT.equals(tate0)&&comyokoAT.equals(yoko0)){
+
+            //Wの位置を取り出す
+            var tate0 = (String) httpSession.getAttribute("tate");
+            var yoko0 = (String) httpSession.getAttribute("yoko");
+            var comtate = (String) httpSession.getAttribute("comtate");
+            var comyoko = (String) httpSession.getAttribute("comyoko");
+
+            model.addAttribute("tate", tate0);
+            model.addAttribute("yoko", yoko0);
+            model.addAttribute("comtate", comtate);
+            model.addAttribute("comyoko", comyoko);
+
+            model.addAttribute("myAttack", myAT);
+            model.addAttribute("comAttack", comAT);
+
+
+            System.out.println(hantei);
+
+
+            if (tateAT.equals(comtate) && yokoAT.equals(comyoko)) {
+
+                if (comtateAT.equals(tate0) && comyokoAT.equals(yoko0)) {
                     var joukyou = "引き分け";
-                    model.addAttribute("joukyou",joukyou);
-                    return "win";
+                    model.addAttribute("joukyou", joukyou);
+                    model.addAttribute("tesuu", tesuu);
+                    var result = tesuu + "手目で引き分けました";
+                    sensekiServise.kiroku(result);
+                    return "draw";
                 }
 
                 var joukyou = "win";
-                model.addAttribute("joukyou",joukyou);
+                model.addAttribute("joukyou", joukyou);
+                model.addAttribute("tesuu", tesuu);
+                var result = "プレイヤーが" + tesuu + "手目で勝ちました";
+                System.out.println(result);
+                sensekiServise.kiroku(result);
                 return "win";
 
-            } else if(comtateAT.equals(tate0)&&comyokoAT.equals(yoko0)){
+            } else if (comtateAT.equals(tate0) && comyokoAT.equals(yoko0)) {
 
                 var joukyou = "あ な た の ま け";
-                model.addAttribute("joukyou",joukyou);
-                return "win";
+                model.addAttribute("joukyou", joukyou);
+                model.addAttribute("tesuu", tesuu);
+                var result = "CPUが" + tesuu + "手目で勝ちました";
+                sensekiServise.kiroku(result);
+                return "lose";
             }
 
             var joukyou = "二人共はずれ";
-            model.addAttribute("joukyou",joukyou);
+            model.addAttribute("joukyou", joukyou);
+            tesuu++;
+            model.addAttribute("tesuu", tesuu);
 
             return "game";
 
-        }else if(hantei==0){
+            //入力エラーが起こると更新していない数値を渡し手数を進めさせない
+        } else if (hantei == 0) {
             var joukyou = "数字を入力して下さい";
-            model.addAttribute("joukyou",joukyou);
+            var tate0 = (String) httpSession.getAttribute("tate");
+            var yoko0 = (String) httpSession.getAttribute("yoko");
+            model.addAttribute("tate", tate0);
+            model.addAttribute("yoko", yoko0);
+            model.addAttribute("joukyou", joukyou);
+            model.addAttribute("myAttack", myAT);
+            model.addAttribute("comAttack", comAT);
+            model.addAttribute("tesuu", tesuu);
             return "game";
-        }else {
+        } else {
             var joukyou = "0~4を入力して下さい";
-            model.addAttribute("joukyou",joukyou);
+            var tate0 = (String) httpSession.getAttribute("tate");
+            var yoko0 = (String) httpSession.getAttribute("yoko");
+            model.addAttribute("tate", tate0);
+            model.addAttribute("yoko", yoko0);
+            model.addAttribute("joukyou", joukyou);
+            model.addAttribute("myAttack", myAT);
+            model.addAttribute("comAttack", comAT);
+            model.addAttribute("tesuu", tesuu);
             return "game";
         }
+    }
 
 
 
 
 
+
+
+    @GetMapping("result")
+    public String result(Model model){
+        var allresult = sensekiServise.findAll();
+        model.addAttribute("allresult",allresult);
+        System.out.println("aaaa");
+
+        return "result";
     }
 
 }
