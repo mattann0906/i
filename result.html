@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<form action="title" method="get">
+
+<ul th:each="result ,ri:${allresult}">
+
+    <p th:text="${ri.count}+'回目'+'  '+${result.syouhai}"></p>
+
+</ul>
+
+
+    <p></p>
+    <button type="submit">もう一度プレイ</button>
+</form>
+</body>
+</html>
