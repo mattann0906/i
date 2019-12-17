@@ -10,6 +10,10 @@
 <p>[[${tate}]]</p>
 <p>[[${yoko}]]</p>
 
+<p></p>
+<p>[[${tesuu}]]ターン目</p>
+<p></p>
+
 <p>[[${joukyou}]]</p>
 <p>縦(1~5):<input name="tate" ></p>
 <p>横(1~5):<input name="yoko" ></p>
@@ -39,7 +43,7 @@
             document.write('<th>'+i+'</th>');
 
             for(j=1;j<=5;j++){
-                if(i==tate&&j==yoko){
+                if(i==yoko&&j==tate){
                     document.write('<td>'+'W'+'</td>');
                 }else {
                     document.write('<td>'+'</td>');
@@ -73,13 +77,14 @@
             document.write('<th>'+i+'</th>');
 
             for(j=1;j<=5;j++){
-                    document.write('<td>'+'</td>');
+                document.write('<td>'+'</td>');
             }
 
             document.write('</tr>');
         }
 
     </script>
+    
 </table>
 
 </form>
