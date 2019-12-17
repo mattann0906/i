@@ -10,6 +10,9 @@
 <p>[[${tate}]]</p>
 <p>[[${yoko}]]</p>
 
+<p></p>
+    <p>[[${tesuu}]]ターン目</p>
+
 <p>[[${joukyou}]]</p>
 <p>縦(1~5):<input name="tate" ></p>
 <p>横(1~5):<input name="yoko" ></p>
@@ -43,14 +46,32 @@
         allcomAttack.push(comAttack);
 
         for(i=1;i<=5;i++){
+            ifhantei = 0;
+
             document.write('<tr>');
             document.write('<th>'+i+'</th>');
+
             for(j=1;j<=5;j++){
-                if(i==tate&&j==yoko){
+
+                for(n=0; n<comAttack.length; n++){
+                    if(comAttack[n]==count){
+                        document.write('<td>'+"・"+'</td>');
+                        ifhantei = 1;
+                    }
+                }
+
+                if(ifhantei==1){
+                    count++;
+                    ifhantei = 0;
+                    continue;
+                }
+
+                if(i==yoko&&j==tate){
                     document.write('<td>'+'W'+'</td>');
                 }else {
                     document.write('<td>'+'</td>');
                 }
+                count++;
             }
             document.write('</tr>');
         }
@@ -76,8 +97,6 @@
         var ifhantei;
         var myAttack=[[${myAttack}]];
 
-
-        console.table(myAttack.length);
 
 
 
@@ -106,10 +125,11 @@
                 }
 
                 document.write('<td>'+'</td>');
+                count++;
             }
 
             document.write('</tr>');
-            count++;
+
         }
 
     </script>
